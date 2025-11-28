@@ -52,5 +52,14 @@
         "author": "YoanDev",
         "gemini_url": "symfony.html",
         "original_url": "https://symfony.com/"
+    },
+    {
+        "id": "ansm",
+        "name": "ANSM",
+        "description": "Agence nationale de sécurité du médicament et des produits de santé.",
+        "icon": "🏥",
+        "author": "Mike Dreeman",
+        "gemini_url": "ansm.html",
+        "original_url": "https://www.ansm.fr/"
     }
 ]

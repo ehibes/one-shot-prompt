@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANSM - Agence Nationale de Sécurité du Médicament (Concept Redesign)</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#030712', // Very dark blue/black
+                            surface: '#0f172a', // Slate 900
+                            primary: '#3b82f6', // Blue 500
+                            accent: '#06b6d4', // Cyan 500
+                            alert: '#f97316', // Orange 500
+                            success: '#10b981', // Emerald 500
+                        }
+                    },
+                    backgroundImage: {
+                        'hero-glow': 'conic-gradient(from 90deg at 50% 50%, #00000000 50%, #0f172a 100%), radial-gradient(circle at 50% 50%, #1e293b 0%, #030712 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Utilities */
+        body {
+            background-color: #030712;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-header {
+            background: rgba(3, 7, 18, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #67e8f9 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .text-gradient-alert {
+            background: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Animated Background Particles */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scroll-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom Cursor placeholder styling */
+        .search-input:focus {
+            box-shadow: 0 0 40px -10px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-500 selection:text-white">
+
+    <!-- Canvas for Neural Network Effect -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-header transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-[0_0_20px_rgba(6,182,212,0.5)] group-hover:scale-110 transition-transform">
+                    A
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-display font-bold text-xl tracking-tight leading-none">ANSM</span>
+                    <span class="text-[10px] text-slate-400 tracking-widest uppercase">Sécurité & Santé</span>
+                </div>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#" class="text-sm font-medium text-slate-300 hover:text-white hover:text-cyan-400 transition-colors">Médicaments</a>
+                <a href="#" class="text-sm font-medium text-slate-300 hover:text-white hover:text-cyan-400 transition-colors">Dispositifs Médicaux</a>
+                <a href="#" class="text-sm font-medium text-slate-300 hover:text-white hover:text-cyan-400 transition-colors">Vaccins</a>
+                <a href="#" class="text-sm font-medium text-slate-300 hover:text-white hover:text-cyan-400 transition-colors">Actualités</a>
+            </div>
+
+            <!-- CTA Actions -->
+            <div class="flex items-center gap-4">
+                <button class="hidden lg:flex items-center gap-2 text-sm text-slate-300 hover:text-white px-4 py-2 rounded-full border border-slate-700 hover:border-slate-500 transition-all">
+                    <i class="ph ph-user-circle text-lg"></i>
+                    Espace Pro
+                </button>
+                <button class="bg-white text-brand-dark px-5 py-2.5 rounded-full font-bold text-sm hover:bg-cyan-50 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center gap-2">
+                    <i class="ph ph-warning-circle text-lg text-orange-600"></i>
+                    Déclarer un effet
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex flex-col justify-center items-center pt-20 overflow-hidden">
+            
+            <!-- Abstract Glow -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[120px] animate-pulse"></div>
+
+            <div class="relative z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center">
+                
+                <!-- Status Badge -->
+                <div class="gsap-hero opacity-0 translate-y-10 mb-6 inline-flex items-center gap-2 px-3 py-1 rounded-full glass-panel border border-emerald-500/30 text-emerald-400 text-xs font-medium tracking-wide uppercase">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    Système de vigilance actif
+                </div>
+
+                <h1 class="gsap-hero opacity-0 translate-y-10 font-display text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter mb-6">
+                    La sentinelle de <br>
+                    <span class="text-gradient">votre santé.</span>
+                </h1>
+                
+                <p class="gsap-hero opacity-0 translate-y-10 text-slate-400 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
+                    L'ANSM garantit la sécurité et l'accès aux produits de santé.
+                    <span class="text-slate-200">Innovation, contrôle et transparence</span> pour tous les patients.
+                </p>
+
+                <!-- Modern Search Bar -->
+                <div class="gsap-hero opacity-0 translate-y-10 w-full max-w-2xl relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                    <div class="relative bg-slate-900/80 backdrop-blur-xl border border-slate-700 rounded-full flex items-center p-2 shadow-2xl transition-all border-slate-600 group-hover:border-cyan-500/50">
+                        <div class="pl-4 pr-2 text-slate-400">
+                            <i class="ph ph-magnifying-glass text-xl"></i>
+                        </div>
+                        <input type="text" placeholder="Rechercher un médicament, un dispositif, une alerte..." 
+                               class="search-input w-full bg-transparent border-none outline-none text-white placeholder-slate-500 h-12 text-lg">
+                        <button class="bg-blue-600 hover:bg-blue-500 text-white rounded-full p-3 transition-colors">
+                            <i class="ph ph-arrow-right font-bold"></i>
+                        </button>
+                    </div>
+                    <div class="mt-4 flex gap-4 justify-center text-sm text-slate-500">
+                        <span>Populaires :</span>
+                        <a href="#" class="hover:text-cyan-400 underline decoration-slate-700 underline-offset-4 transition-all">Doliprane</a>
+                        <a href="#" class="hover:text-cyan-400 underline decoration-slate-700 underline-offset-4 transition-all">Vaccins</a>
+                        <a href="#" class="hover:text-cyan-400 underline decoration-slate-700 underline-offset-4 transition-all">Amoxicilline</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-slate-500">
+                <i class="ph ph-caret-down text-2xl"></i>
+            </div>
+        </section>
+
+        <!-- Live Alerts Section (Ticker) -->
+        <div class="border-y border-white/5 bg-slate-900/50 backdrop-blur-sm relative z-20">
+            <div class="max-w-7xl mx-auto flex items-center h-16">
+                <div class="bg-orange-600/10 text-orange-500 px-6 h-full flex items-center font-bold text-sm tracking-wider border-r border-white/5 whitespace-nowrap">
+                    <i class="ph ph-siren mr-2 text-lg"></i> FLASH SÉCURITÉ
+                </div>
+                <div class="overflow-hidden relative flex-1 mask-linear">
+                    <div class="animate-marquee whitespace-nowrap flex items-center gap-12 px-6 text-sm text-slate-300">
+                        <span class="flex items-center"><span class="w-2 h-2 bg-orange-500 rounded-full mr-3"></span><strong>RAPPEL PRODUIT :</strong> Seringue à code couleur 10 ml – MedNet GmbH (26/11/2025)</span>
+                        <span class="flex items-center"><span class="w-2 h-2 bg-orange-500 rounded-full mr-3"></span><strong>INFORMATION :</strong> Neurostimulateur Restore – Medtronic Inc (28/11/2025)</span>
+                        <span class="flex items-center"><span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span><strong>DISPONIBILITÉ :</strong> Retour à la normale pour Amoxicilline sirop enfant.</span>
+                        <span class="flex items-center"><span class="w-2 h-2 bg-orange-500 rounded-full mr-3"></span><strong>RAPPEL :</strong> Capteur FreeStyle Libre 3 – Abbott Diabetes Care Ltd.</span>
+                    </div>
+                </div>
+                <a href="#" class="hidden md:flex items-center px-6 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-wider h-full border-l border-white/5 transition-colors">
+                    Voir tout <i class="ph ph-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Bento Grid Services -->
+        <section class="py-24 px-6 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                    <div>
+                        <h2 class="font-display text-3xl md:text-5xl font-bold mb-4">Accès Rapide</h2>
+                        <p class="text-slate-400">Les outils essentiels pour chaque profil.</p>
+                    </div>
+                    
+                    <!-- Toggle Switch UI -->
+                    <div class="glass-panel p-1 rounded-full flex gap-1 mt-6 md:mt-0">
+                        <button class="px-6 py-2 rounded-full bg-slate-700 text-white shadow-lg text-sm font-medium transition-all">Grand Public</button>
+                        <button class="px-6 py-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white text-sm font-medium transition-all">Professionnels</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 grid-rows-2 h-auto md:h-[600px]">
+                    
+                    <!-- Card 1: Large Feature -->
+                    <div class="service-card md:col-span-2 md:row-span-2 glass-panel rounded-3xl p-8 relative overflow-hidden group cursor-pointer border-l-4 border-l-cyan-500">
+                        <div class="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="relative z-10 h-full flex flex-col justify-between">
+                            <div>
+                                <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 mb-6">
+                                    <i class="ph ph-pill text-2xl"></i>
+                                </div>
+                                <h3 class="text-3xl font-bold mb-3 font-display">Annuaire des Médicaments</h3>
+                                <p class="text-slate-400 leading-relaxed">Accédez à la base de données publique officielle. Notices, prix, taux de remboursement et informations de sécurité en temps réel.</p>
+                            </div>
+                            <div class="flex items-center gap-3 text-cyan-400 font-bold mt-8 group-hover:translate-x-2 transition-transform">
+                                Consulter la base <i class="ph ph-arrow-right"></i>
+                            </div>
+                        </div>
+                        <!-- Decorative bg icon -->
+                        <i class="ph ph-pill absolute -bottom-10 -right-10 text-[200px] text-white/5 rotate-12 group-hover:rotate-0 transition-transform duration-700"></i>
+                    </div>
+
+                    <!-- Card 2: Alert Action -->
+                    <div class="service-card md:col-span-2 glass-panel rounded-3xl p-8 relative overflow-hidden group cursor-pointer border-l-4 border-l-orange-500 hover:bg-orange-500/10 transition-colors">
+                        <div class="flex items-start justify-between relative z-10">
+                            <div>
+                                <h3 class="text-2xl font-bold mb-2 font-display text-white">Signaler un effet indésirable</h3>
+                                <p class="text-slate-400 text-sm">Vous avez ressenti un effet secondaire ? Déclarez-le immédiatement.</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
+                                <i class="ph ph-warning text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Stock -->
+                    <div class="service-card md:col-span-1 glass-panel rounded-3xl p-6 relative overflow-hidden group cursor-pointer hover:border-blue-500/50 transition-colors">
+                        <i class="ph ph-trend-down text-3xl text-blue-400 mb-4"></i>
+                        <h4 class="text-lg font-bold mb-2">Ruptures de stock</h4>
+                        <p class="text-xs text-slate-400 mb-4">Vérifiez la disponibilité des traitements.</p>
+                        <div class="w-full bg-slate-700 h-1 rounded-full overflow-hidden">
+                            <div class="w-3/4 bg-blue-500 h-full"></div>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-2 text-right">Mise à jour : 12:00</p>
+                    </div>
+
+                    <!-- Card 4: Clinical Trials -->
+                    <div class="service-card md:col-span-1 glass-panel rounded-3xl p-6 relative overflow-hidden group cursor-pointer hover:border-purple-500/50 transition-colors">
+                        <i class="ph ph-flask text-3xl text-purple-400 mb-4"></i>
+                        <h4 class="text-lg font-bold mb-2">Essais Cliniques</h4>
+                        <p class="text-xs text-slate-400">Rejoindre ou consulter les recherches en cours.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- News / Modern Cards -->
+        <section class="py-12 bg-slate-900/50">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex items-center justify-between mb-10">
+                    <h2 class="font-display text-3xl font-bold"><span class="text-gradient">Actualités</span> & Décisions</h2>
+                    <a href="#" class="text-slate-400 hover:text-white text-sm flex items-center gap-2">Voir toutes les actus <i class="ph ph-arrow-right"></i></a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- News Item 1 -->
+                    <article class="group">
+                        <div class="h-48 w-full rounded-2xl bg-slate-800 overflow-hidden relative mb-4">
+                             <!-- Placeholder visualization using CSS -->
+                             <div class="absolute inset-0 bg-gradient-to-tr from-slate-800 to-slate-700 group-hover:scale-105 transition-transform duration-500"></div>
+                             <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                                <i class="ph ph-dna text-6xl text-slate-500"></i>
+                             </div>
+                             <div class="absolute top-4 left-4 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded">MÉDICAMENTS</div>
+                        </div>
+                        <div class="text-xs text-slate-500 mb-2">28 Novembre 2025</div>
+                        <h3 class="text-xl font-bold leading-tight mb-2 group-hover:text-blue-400 transition-colors">Nouvelles recommandations sur l'usage des vasoconstricteurs</h3>
+                        <p class="text-slate-400 text-sm line-clamp-2">L'ANSM publie un nouveau guide à destination des pharmaciens pour limiter les risques cardiovasculaires.</p>
+                    </article>
+
+                    <!-- News Item 2 -->
+                    <article class="group">
+                        <div class="h-48 w-full rounded-2xl bg-slate-800 overflow-hidden relative mb-4">
+                             <div class="absolute inset-0 bg-gradient-to-tr from-slate-800 to-slate-700 group-hover:scale-105 transition-transform duration-500"></div>
+                             <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                                <i class="ph ph-syringe text-6xl text-slate-500"></i>
+                             </div>
+                             <div class="absolute top-4 left-4 bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded">VACCINS</div>
+                        </div>
+                        <div class="text-xs text-slate-500 mb-2">27 Novembre 2025</div>
+                        <h3 class="text-xl font-bold leading-tight mb-2 group-hover:text-emerald-400 transition-colors">Campagne hivernale : tout savoir sur les stocks</h3>
+                        <p class="text-slate-400 text-sm line-clamp-2">Point de situation hebdomadaire sur la disponibilité des vaccins contre la grippe et le COVID-19.</p>
+                    </article>
+
+                    <!-- News Item 3 -->
+                    <article class="group">
+                        <div class="h-48 w-full rounded-2xl bg-slate-800 overflow-hidden relative mb-4">
+                             <div class="absolute inset-0 bg-gradient-to-tr from-slate-800 to-slate-700 group-hover:scale-105 transition-transform duration-500"></div>
+                             <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                                <i class="ph ph-desktop text-6xl text-slate-500"></i>
+                             </div>
+                             <div class="absolute top-4 left-4 bg-purple-600 text-white text-[10px] font-bold px-2 py-1 rounded">E-SANTÉ</div>
+                        </div>
+                        <div class="text-xs text-slate-500 mb-2">25 Novembre 2025</div>
+                        <h3 class="text-xl font-bold leading-tight mb-2 group-hover:text-purple-400 transition-colors">Lancement de l'application "Ma Sécurité Médicament"</h3>
+                        <p class="text-slate-400 text-sm line-clamp-2">Une nouvelle interface mobile pour scanner vos boîtes et accéder immédiatement à la notice à jour.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Visualization Section (Concept) -->
+        <section class="py-24 relative overflow-hidden">
+             <!-- Decorative elements -->
+             <div class="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-blue-900/20 to-transparent"></div>
+
+             <div class="max-w-7xl mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center gap-12">
+                <div class="w-full md:w-1/2">
+                    <h2 class="font-display text-4xl font-bold mb-6">La transparence par la <span class="text-gradient">Data</span>.</h2>
+                    <p class="text-slate-400 text-lg mb-8">L'ANSM ouvre ses données pour permettre aux chercheurs et au public de suivre l'évolution de la consommation et de la sécurité des produits de santé.</p>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="p-4 border-l border-slate-700">
+                            <div class="text-3xl font-bold text-white mb-1 counter" data-target="14500">0</div>
+                            <div class="text-sm text-slate-500 uppercase tracking-wider">AMM Délivrées</div>
+                        </div>
+                        <div class="p-4 border-l border-slate-700">
+                            <div class="text-3xl font-bold text-white mb-1 counter" data-target="98">0%</div>
+                            <div class="text-sm text-slate-500 uppercase tracking-wider">Taux de réponse</div>
+                        </div>
+                    </div>
+
+                    <button class="mt-8 text-cyan-400 hover:text-white border-b border-cyan-400 hover:border-white pb-1 transition-colors">Explorer Data.ANSM</button>
+                </div>
+                
+                <div class="w-full md:w-1/2 h-[400px] glass-panel rounded-3xl p-6 flex items-center justify-center relative">
+                    <!-- Abstract Chart Representation -->
+                    <div class="flex items-end gap-4 h-48 w-full max-w-md mx-auto">
+                        <div class="w-1/5 bg-blue-900/50 h-[40%] rounded-t-lg relative group">
+                            <div class="absolute bottom-0 w-full bg-blue-500 h-0 group-hover:h-full transition-all duration-700 rounded-t-lg"></div>
+                        </div>
+                        <div class="w-1/5 bg-blue-900/50 h-[60%] rounded-t-lg relative group">
+                            <div class="absolute bottom-0 w-full bg-blue-500 h-0 group-hover:h-full transition-all duration-700 delay-100 rounded-t-lg"></div>
+                        </div>
+                        <div class="w-1/5 bg-blue-900/50 h-[30%] rounded-t-lg relative group">
+                            <div class="absolute bottom-0 w-full bg-blue-500 h-0 group-hover:h-full transition-all duration-700 delay-200 rounded-t-lg"></div>
+                        </div>
+                        <div class="w-1/5 bg-blue-900/50 h-[80%] rounded-t-lg relative group">
+                            <div class="absolute bottom-0 w-full bg-cyan-400 h-0 group-hover:h-full transition-all duration-700 delay-300 rounded-t-lg shadow-[0_0_20px_rgba(34,211,238,0.5)]"></div>
+                        </div>
+                        <div class="w-1/5 bg-blue-900/50 h-[50%] rounded-t-lg relative group">
+                            <div class="absolute bottom-0 w-full bg-blue-500 h-0 group-hover:h-full transition-all duration-700 delay-400 rounded-t-lg"></div>
+                        </div>
+                    </div>
+                    <div class="absolute top-6 left-6 text-xs font-mono text-slate-500">MONITORING CONSO ANTIBIOTIQUES</div>
+                </div>
+             </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-black pt-20 pb-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center gap-2 mb-6">
+                         <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">A</div>
+                         <span class="font-bold text-xl text-white">ANSM</span>
+                    </div>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Agence nationale de sécurité du médicament et des produits de santé. <br>Établissement public sous la tutelle du ministère chargé de la Santé.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold mb-6">Produits de santé</h4>
+                    <ul class="space-y-4 text-sm text-slate-500">
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Médicaments</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Vaccins</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Dispositifs médicaux</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Cosmétiques</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-6">L'Agence</h4>
+                    <ul class="space-y-4 text-sm text-slate-500">
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Qui sommes-nous ?</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Nos instances</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Déontologie</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Recrutement</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-6">Contact & Urgence</h4>
+                    <div class="glass-panel p-4 rounded-xl text-center mb-4">
+                        <p class="text-xs text-slate-400 mb-2">Un problème de santé immédiat ?</p>
+                        <p class="text-xl font-bold text-white">15 (SAMU)</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-cyan-600 hover:text-white transition-all"><i class="ph ph-twitter-logo"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-blue-700 hover:text-white transition-all"><i class="ph ph-linkedin-logo"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white transition-all"><i class="ph ph-youtube-logo"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-600">
+                <p>&copy; 2025 ANSM. République Française.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-slate-400">Mentions légales</a>
+                    <a href="#" class="hover:text-slate-400">Données personnelles</a>
+                    <a href="#" class="hover:text-slate-400">Gestion des cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Canvas Particle Background
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        document.getElementById('canvas-container').appendChild(canvas);
+
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2;
+                this.color = Math.random() > 0.5 ? 'rgba(59, 130, 246, ' : 'rgba(6, 182, 212, '; 
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color + (Math.random() * 0.5 + 0.1) + ')';
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw connections (molecular effect)
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+                
+                for (let j = index + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(100, 116, 139, ${0.1 - dist/1500})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        initParticles();
+        animateParticles();
+
+        // GSAP Animations
+        document.addEventListener("DOMContentLoaded", (event) => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero Animation
+            gsap.to(".gsap-hero", {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                stagger: 0.2,
+                ease: "power3.out"
+            });
+
+            // Scroll Reveal for Cards
+            gsap.utils.toArray(".service-card").forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%",
+                    },
+                    y: 50,
+                    opacity: 0,
+                    duration: 0.8,
+                    delay: i * 0.1,
+                    ease: "power2.out"
+                });
+            });
+
+            // Navbar Blur effect on scroll
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    nav.classList.add('shadow-lg');
+                    nav.style.background = 'rgba(3, 7, 18, 0.9)';
+                } else {
+                    nav.classList.remove('shadow-lg');
+                    nav.style.background = 'rgba(3, 7, 18, 0.7)';
+                }
+            });
+
+            // Counter Animation
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const suffix = counter.innerText.includes('%') ? '%' : '';
+                
+                gsap.to(counter, {
+                    scrollTrigger: {
+                        trigger: counter,
+                        start: "top 80%",
+                    },
+                    innerHTML: target,
+                    duration: 2,
+                    snap: { innerHTML: 1 },
+                    onUpdate: function() {
+                        counter.innerHTML = Math.ceil(this.targets()[0].innerHTML) + suffix;
+                    }
+                });
+            });
+        });
+
+        // Simple Marquee CSS injection
+        const style = document.createElement('style');
+        style.innerHTML = `
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 30s linear infinite;
+        }
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
+        .mask-linear {
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
