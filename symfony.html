@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symfony 8 • The High Performance PHP Framework</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette Dark Mode "Deep Space" */
+            --bg-app: #030304;
+            --bg-panel: #0E0E10;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(255, 255, 255, 0.15);
+            
+            /* Couleurs Signature Symfony "Neon" */
+            --brand-primary: #8a2be2; /* Violet électrique */
+            --brand-glow: #a855f7;
+            --accent-cyan: #22d3ee;
+            --accent-pink: #f472b6;
+
+            /* Typographie */
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Effets d'Arrière-plan --- */
+        .ambient-light {
+            position: fixed;
+            width: 80vw;
+            height: 80vh;
+            background: radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.08), transparent 60%);
+            top: -20%;
+            left: 10%;
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(80px);
+            animation: pulseLight 10s infinite alternate;
+        }
+
+        @keyframes pulseLight {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(var(--border-subtle) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.07;
+            z-index: -1;
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        }
+
+        /* --- Navigation --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-mark {
+            width: 24px;
+            height: 24px;
+            background: white;
+            color: black;
+            display: grid;
+            place-items: center;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }
+
+        .nav-items {
+            display: none; /* Mobile first hidden */
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        @media(min-width: 768px) { .nav-items { display: flex; } }
+
+        .nav-items a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-items a:hover { color: white; }
+
+        .btn-cta {
+            background: white;
+            color: black;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        /* --- Hero Section --- */
+        header.hero {
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 8rem 1rem 4rem;
+            position: relative;
+        }
+
+        .badge-new {
+            background: rgba(138, 43, 226, 0.15);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            color: var(--brand-glow);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(180deg, #fff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        h1 span {
+            display: block;
+            background: linear-gradient(90deg, var(--brand-glow), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.hero-text {
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+        }
+
+        .cmd-line {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border-subtle);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            animation: fadeInUp 0.8s ease-out 0.6s backwards;
+        }
+        .cmd-line:hover { border-color: var(--text-muted); color: white; }
+        .cmd-prompt { color: var(--brand-glow); }
+
+        /* --- Stats Section --- */
+        .stats-ticker {
+            display: flex;
+            gap: 4rem;
+            margin-top: 4rem;
+            opacity: 0.5;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .stat-item { text-align: center; }
+        .stat-val { font-weight: 700; font-size: 1.5rem; display: block; color: white; }
+        .stat-lbl { font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* --- Bento Grid Section --- */
+        section.features {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .bento-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 320px;
+        }
+
+        .bento-card:hover {
+            border-color: var(--border-active);
+            transform: translateY(-4px);
+        }
+
+        .card-glow {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .bento-card:hover .card-glow { opacity: 1; }
+
+        .bento-card.wide {
+            grid-column: span 1;
+        }
+        @media(min-width: 900px) { .bento-card.wide { grid-column: span 2; } }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .card-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .card-desc { color: var(--text-muted); font-size: 1rem; }
+
+        /* --- Code Block Visual --- */
+        .code-preview {
+            background: #000;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #d4d4d8;
+            margin-top: 1.5rem;
+            border: 1px solid #222;
+        }
+        .kw { color: #c084fc; } /* Keyword */
+        .str { color: #a5f3fc; } /* String */
+        .cls { color: #fbbf24; } /* Class */
+        .fn { color: #60a5fa; } /* Function */
+
+        /* --- Animations --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Footer --- */
+        footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 4rem;
+            font-size: 0.9rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="ambient-light"></div>
+    <div class="grid-overlay"></div>
+
+    <nav>
+        <div class="logo">
+            <div class="logo-mark">S</div>
+            Symfony
+        </div>
+        <ul class="nav-items">
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Composants</a></li>
+            <li><a href="#">Communauté</a></li>
+            <li><a href="#">Entreprise</a></li>
+        </ul>
+        <a href="#" class="btn-cta">Démarrer</a>
+    </nav>
+
+    <header class="hero">
+        <div class="badge-new">
+            <span style="width:8px;height:8px;background:currentColor;border-radius:50%"></span>
+            Symfony 8.0 est disponible
+        </div>
+        
+        <h1>
+            Construisez l'ambition.<br>
+            <span>À n'importe quelle échelle.</span>
+        </h1>
+        
+        <p class="hero-text">
+            Le framework PHP haute performance pour les créateurs qui refusent le compromis entre vitesse, flexibilité et robustesse.
+        </p>
+
+        <div class="cmd-line" id="copyCmd">
+            <span class="cmd-prompt">$</span>
+            <span id="cmdText">composer create-project symfony/skeleton my_project</span>
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="opacity:0.5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+            </svg>
+        </div>
+
+        <div class="stats-ticker">
+            <div class="stat-item">
+                <span class="stat-val">34 Mrd+</span>
+                <span class="stat-lbl">Téléchargements</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">600k+</span>
+                <span class="stat-lbl">Développeurs</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">3k+</span>
+                <span class="stat-lbl">Contributeurs</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="features">
+        <h2 class="section-title">L'Écosystème Intégral</h2>
+        
+        <div class="bento-grid">
+            <div class="bento-card wide">
+                <div class="card-glow"></div>
+                <div>
+                    <div class="card-icon">⚡</div>
+                    <h3 class="card-title">Expérience Développeur Fluide</h3>
+                    <p class="card-desc">CLI puissante, débogage en temps réel avec la Toolbar et rechargement à chaud. Codez plus, configurez moins.</p>
+                </div>
+                <div class="code-preview">
+                    <span class="kw">class</span> <span class="cls">ProductController</span> <span class="kw">extends</span> <span class="cls">AbstractController</span> {<br>
+                    &nbsp;&nbsp;<span class="kw">#[Route]</span>(<span class="str">'/products'</span>)<br>
+                    &nbsp;&nbsp;<span class="kw">public function</span> <span class="fn">index</span>(): <span class="cls">Response</span> {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="var">$this</span>-><span class="fn">json</span>(['status' => <span class="str">'fast'</span>]);<br>
+                    &nbsp;&nbsp;}<br>
+                    }
+                </div>
+            </div>
+
+            <div class="bento-card">
+                <div class="card-glow"></div>
+                <div class="card-icon">🧩</div>
+                <h3 class="card-title">Composants découplés</h3>
+                <p class="card-desc">Utilisez ce dont vous avez besoin. Le moteur de Laravel, Drupal et Magento est à votre disposition.</p>
+            </div>
+
+            <div class="bento-card">
+                <div class="card-glow"></div>
+                <div class="card-icon">🌐</div>
+                <h3 class="card-title">API First</h3>
+                <p class="card-desc">Générez instantanément des API Hypermedia et GraphQL modernes grâce à l'intégration native API Platform.</p>
+            </div>
+
+            <div class="bento-card">
+                <div class="card-glow"></div>
+                <div class="card-icon">🛡️</div>
+                <h3 class="card-title">Sécurité Enterprise</h3>
+                <p class="card-desc">Protection CSRF/XSS par défaut. Mises à jour de sécurité garanties sur les versions LTS.</p>
+            </div>
+
+            <div class="bento-card wide">
+                <div class="card-glow"></div>
+                <div>
+                    <div class="card-icon">🎨</div>
+                    <h3 class="card-title">Moteur de Template Twig</h3>
+                    <p class="card-desc">Une syntaxe concise, sécurisée et flexible pour le frontend, supportant l'héritage de layout.</p>
+                </div>
+                <div class="code-preview">
+                    {% <span class="kw">extends</span> <span class="str">'base.html.twig'</span> %}<br>
+                    {% <span class="kw">block</span> body %}<br>
+                    &nbsp;&nbsp;&lt;h1&gt;Hello {{ user.name }}&lt;/h1&gt;<br>
+                    {% <span class="kw">endblock</span> %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 Symfony SAS. Code sous licence MIT. Design Concept "Noir".</p>
+    </footer>
+
+    <script>
+        // Effet de "Glow" qui suit la souris sur les cartes Bento
+        const cards = document.querySelectorAll('.bento-card');
+
+        document.body.addEventListener('mousemove', (e) => {
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Simple interaction "Copier commande"
+        const cmdLine = document.getElementById('copyCmd');
+        const cmdText = document.getElementById('cmdText');
+        
+        cmdLine.addEventListener('click', () => {
+            navigator.clipboard.writeText(cmdText.innerText).then(() => {
+                const original = cmdText.innerText;
+                cmdText.innerText = "Copié dans le presse-papier !";
+                cmdText.style.color = "#4ade80"; // Green
+                
+                setTimeout(() => {
+                    cmdText.innerText = original;
+                    cmdText.style.color = "";
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

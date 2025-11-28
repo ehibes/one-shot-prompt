@@ -248,6 +248,17 @@
             line-height: 1.5;
         }
 
+        .project-author {
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            margin-top: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.8;
+        }
+
         .project-actions {
             display: flex;
             flex-direction: column;
@@ -330,8 +341,13 @@
         
         <!-- Header -->
         <div class="card header-card">
-            <h1>Portail One Shot</h1>
-            <p class="subtitle">Expérience Web Instantanée &bull; Propulsée par Gemini 3 PRO</p>
+            <h1>One Shot Prompt</h1>
+            <p class="subtitle">Une expérience collaborative Open Source &bull; Testez le prompt, générez, et soumettez votre PR !</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="https://github.com/YoanBernabeu/one-shot-prompt/blob/main/CONTRIBUTING.md" target="_blank" class="btn btn-secondary" style="display: inline-flex; width: auto;">
+                    <span>📖 Comment contribuer ?</span>
+                </a>
+            </div>
         </div>
 
         <!-- The Prompt -->
@@ -350,79 +366,70 @@
             <div class="prompt-content">
 <span class="keyword">Consulte</span> et <span class="keyword">analyse</span> le site web <span class="link">https://exemple.com</span>
 <span class="keyword">Propose-moi</span> une refonte <span class="highlight">"ultra-moderne, actuelle, inspirant au design audacieux"</span>.
-Livrable : <span class="keyword">UN fichier HTML</span> avec JS/CSS.</div>
+Livrable : <span class="keyword">UN fichier HTML</span> avec JS/CSS.
+
+<span style="display:block; margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary); border-top: 1px solid #333; padding-top: 1rem;">
+    👉 Une fois généré, ajoutez votre page HTML et mettez à jour le fichier <span class="highlight">projects.json</span> via une Pull Request !
+</span></div>
         </div>
 
-        <!-- PHP -->
-        <div class="card project-card">
-            <div>
-                <div class="project-icon">🐘</div>
-                <div class="project-info">
-                    <h2>PHP.net</h2>
-                    <p>Documentation officielle, ressources et références pour le langage PHP.</p>
-                </div>
-            </div>
-            <div class="project-actions">
-                <a href="php.html" class="btn btn-primary">Gemini Version ↗</a>
-                <a href="https://www.php.net/" class="btn btn-secondary" target="_blank">Original ↗</a>
-            </div>
-        </div>
-
-        <!-- Calibre -->
-        <div class="card project-card">
-            <div>
-                <div class="project-icon">📚</div>
-                <div class="project-info">
-                    <h2>Calibre</h2>
-                    <p>La solution complète pour la gestion de votre bibliothèque numérique.</p>
-                </div>
-            </div>
-            <div class="project-actions">
-                <a href="calibre.html" class="btn btn-primary">Gemini Version ↗</a>
-                <a href="https://calibre-ebook.com/fr" class="btn btn-secondary" target="_blank">Original ↗</a>
-            </div>
-        </div>
-
-        <!-- Montvendre -->
-        <div class="card project-card">
-            <div>
-                <div class="project-icon">🏔️</div>
-                <div class="project-info">
-                    <h2>Montvendre</h2>
-                    <p>Découvrez le patrimoine, les actualités et la vie de la commune.</p>
-                </div>
-            </div>
-            <div class="project-actions">
-                <a href="montvendre.html" class="btn btn-primary">Gemini Version ↗</a>
-                <a href="https://www.montvendre.fr/fr/" class="btn btn-secondary" target="_blank">Original ↗</a>
-            </div>
-        </div>
-
-        <!-- Joigny -->
-        <div class="card project-card">
-            <div>
-                <div class="project-icon">🧶</div>
-                <div class="project-info">
-                    <h2>Joigny Moquette</h2>
-                    <p>Expertise en revêtements de sol et décoration intérieure depuis 1970.</p>
-                </div>
-            </div>
-            <div class="project-actions">
-                <a href="joigny.html" class="btn btn-primary">Gemini Version ↗</a>
-                <a href="https://www.joigny-moquette.fr/" class="btn btn-secondary" target="_blank">Original ↗</a>
-            </div>
+        <!-- Dynamic Projects Container -->
+        <div id="projects-loader" style="grid-column: span 4; text-align: center; padding: 2rem; color: var(--text-secondary);">
+            Chargement des projets...
         </div>
 
         <!-- Footer -->
-        <div class="card footer-card">
-            <p>© 2023 One Shot Experiment. Generated by Google DeepMind Gemini 3 PRO.</p>
+        <div id="footer-card" class="card footer-card">
+            <p>Licensed under MIT &bull; Yoan Bernabeu 2025 &bull; <a href="CODE_OF_CONDUCT.md" style="color: var(--text-secondary);">Code of Conduct</a></p>
         </div>
 
     </div>
 
     <script>
-        // Mouse tracking for spotlight effect
-        document.querySelectorAll('.card').forEach(card => {
+        // Load projects from JSON
+        async function loadProjects() {
+            try {
+                const response = await fetch('projects.json');
+                const projects = await response.json();
+                const loader = document.getElementById('projects-loader');
+                const footer = document.getElementById('footer-card');
+                const grid = document.querySelector('.bento-grid');
+                
+                // Remove loader
+                loader.remove();
+
+                projects.forEach(project => {
+                    const card = document.createElement('div');
+                    card.className = 'card project-card';
+                    card.innerHTML = `
+                        <div>
+                            <div class="project-icon">${project.icon}</div>
+                            <div class="project-info">
+                                <h2>${project.name}</h2>
+                                <p>${project.description}</p>
+                                ${project.author ? `<div class="project-author"><span>⚡</span> by ${project.author}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="project-actions">
+                            <a href="${project.gemini_url}" class="btn btn-primary">Gemini Version ↗</a>
+                            <a href="${project.original_url}" class="btn btn-secondary" target="_blank">Original ↗</a>
+                        </div>
+                    `;
+                    
+                    // Insert before footer
+                    grid.insertBefore(card, footer);
+                    
+                    // Add mouse tracking for the new card
+                    addMouseTracking(card);
+                });
+
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                document.getElementById('projects-loader').innerText = 'Erreur lors du chargement des projets.';
+            }
+        }
+
+        function addMouseTracking(card) {
             card.addEventListener('mousemove', e => {
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
@@ -430,7 +437,13 @@ Livrable : <span class="keyword">UN fichier HTML</span> avec JS/CSS.</div>
                 card.style.setProperty('--mouse-x', `${x}px`);
                 card.style.setProperty('--mouse-y', `${y}px`);
             });
-        });
+        }
+
+        // Initial mouse tracking for static cards
+        document.querySelectorAll('.card').forEach(addMouseTracking);
+
+        // Start loading
+        loadProjects();
 
         function copyPrompt() {
             const text = `Consulte et analyse le site web https://exemple.com

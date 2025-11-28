@@ -1,0 +1,56 @@
+[
+    {
+        "id": "php",
+        "name": "PHP.net",
+        "description": "Documentation officielle, ressources et références pour le langage PHP.",
+        "icon": "🐘",
+        "author": "YoanDev",
+        "gemini_url": "php.html",
+        "original_url": "https://www.php.net/"
+    },
+    {
+        "id": "calibre",
+        "name": "Calibre",
+        "description": "La solution complète pour la gestion de votre bibliothèque numérique.",
+        "icon": "📚",
+        "author": "YoanDev",
+        "gemini_url": "calibre.html",
+        "original_url": "https://calibre-ebook.com/fr"
+    },
+    {
+        "id": "montvendre",
+        "name": "Montvendre",
+        "description": "Découvrez le patrimoine, les actualités et la vie de la commune.",
+        "icon": "🏔️",
+        "author": "YoanDev",
+        "gemini_url": "montvendre.html",
+        "original_url": "https://www.montvendre.fr/fr/"
+    },
+    {
+        "id": "joigny",
+        "name": "Joigny Moquette",
+        "description": "Expertise en revêtements de sol et décoration intérieure depuis 1970.",
+        "icon": "🧶",
+        "author": "YoanDev",
+        "gemini_url": "joigny.html",
+        "original_url": "https://www.joigny-moquette.fr/"
+    },
+    {
+        "id": "devopsdays",
+        "name": "DevOpsDays",
+        "description": "Conférences communautaires mondiales connectant culture et technologie.",
+        "icon": "🚀",
+        "author": "YoanDev",
+        "gemini_url": "devopsdays.html",
+        "original_url": "https://devopsdays.org/"
+    },
+    {
+        "id": "symfony",
+        "name": "Symfony",
+        "description": "Le framework PHP haute performance pour les développeurs web.",
+        "icon": "🎼",
+        "author": "YoanDev",
+        "gemini_url": "symfony.html",
+        "original_url": "https://symfony.com/"
+    }
+]
